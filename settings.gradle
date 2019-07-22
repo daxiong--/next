@@ -1,0 +1,6 @@
+apply from: "config/module.gradle"
+include ':app'
+include ':base:root'
+
+include ':module:main'
+includeWithApi ':module:sign'

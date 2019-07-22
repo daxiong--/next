@@ -1,0 +1,113 @@
+
+import groovy.json.JsonSlurper
+ext.publish = [:]
+publish.appId = 'com.yuan.next'
+publish.versionCode = 1
+publish.versionName = "1.0"
+
+publish.gpyDebugKey = "4d360dba7924762dde4dc21746f2dcda"
+publish.gpyReleaseKey = "4d360dba7924762dde4dc21746f2dcda"
+
+//base url
+publish.baseUrl = ""
+//build debug true
+
+
+//打包测试环境apk 上传蒲公英 发送邮件功能使用蒲公英自带的邮件功能
+task aassembleDebugToPGYER {
+
+    dependsOn(":app:assembleDebug")
+
+    doLast {
+        uploadApk(true)
+    }
+}
+
+task aassembleReleaseToPGYER {
+
+    dependsOn(":app:assembleRelease")
+
+    doLast {
+        uploadApk(false)
+    }
+}
+
+
+/**
+ * 上传apk到蒲公英
+ */
+def uploadApk(Boolean isDebug) {
+    //查找上传的apk文件
+
+    def path = "$rootDir.path"+"/app/build/outputs/apk/debug/app-debug.apk"
+
+    println(path)
+    def apiKey
+
+    if(isDebug){
+        apiKey = publish.gpyDebugKey
+    }else{
+        apiKey = publish.gpyReleaseKey
+    }
+
+
+    def apk = new File(path)
+    println "*************** start upload file ***************"
+
+    def twoHyphens = "--"
+    def boundary = "*********"
+    def end = "\r\n"
+
+    //模拟表单上传 multipart/form-data
+    def conn = new URL("https://www.pgyer.com/apiv2/app/upload").openConnection()
+    conn.setRequestMethod('POST')
+    conn.setRequestProperty("Connection", "Keep-Alive")
+    conn.setRequestProperty("Charset", "UTF-8")
+    conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary)
+    conn.setDoInput(true)
+    conn.setDoOutput(true)
+
+    //添加参数：_api_key
+    def sb = new StringBuilder()
+    sb.append(twoHyphens).append(boundary).append(end)
+    sb.append("Content-Disposition: form-data; name=_api_key")
+    sb.append(end).append(end)
+    sb.append(apiKey).append(end)
+
+    //添加参数file: 需要上传的apk文件
+    sb.append(twoHyphens).append(boundary).append(end)
+    sb.append("Content-Disposition: form-data; name=file;filename=").append(apk.getName())
+    sb.append(end).append(end)
+
+    def dos = new DataOutputStream(conn.getOutputStream())
+    dos.writeBytes(sb.toString())
+    dos.flush()
+    sb.delete(0, sb.length())
+
+    def fis = new FileInputStream(apk)
+    byte[] bf = new byte[8192]
+    int len
+    while ((len = fis.read(bf)) != -1) {
+        dos.write(bf, 0, len)
+    }
+    sb.append(end)
+    sb.append(twoHyphens).append(boundary).append(end)
+    dos.writeBytes(sb.toString())
+
+    dos.flush()
+    fis.close()
+    dos.close()
+    conn.connect()
+
+    def text = conn.getContent().text
+    def resp = new JsonSlurper().parseText(text)
+
+    println text
+    println "*************** upload finish ***************"
+
+    if (resp.code != 0) {
+        throw new RuntimeException(resp.message)
+    }
+
+}
+

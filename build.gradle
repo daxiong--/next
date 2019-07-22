@@ -1,0 +1,34 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.kotlin_version = '1.0.0'
+    ext.kotlin_version = '1.3.41'
+
+
+    apply from: "config/version.gradle"
+    apply from: "config/module.gradle"
+    apply from: "config/publish.gradle"
+    addRepos(repositories)
+
+
+    dependencies {
+        classpath deps.gradle.tool
+        classpath deps.kotlin.plugin
+        classpath deps.kotlin.allopen
+        classpath deps.ARouter.arouter_register
+        classpath deps.autoRegister
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+    repositories {
+        mavenCentral()
+    }
+
+}
+
+allprojects {
+    addRepos(repositories)
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

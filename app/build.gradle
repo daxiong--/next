@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-allopen'
+
+apply plugin: 'com.alibaba.arouter'
+
+android {
+    compileSdkVersion build_versions.target_sdk
+    defaultConfig {
+        applicationId publish.appId
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode publish.versionCode
+        versionName publish.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+        multiDexEnabled true
+
+    }
+    resourcePrefix project.getName()+"_"
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+
+        abortOnError false
+    }
+}
+
+dependencies {
+    addBaseLib(dependencies)
+    addModularization(dependencies)
+}
+
+apply plugin: 'auto-register'
+
+autoregister {
+    registerInfo = [
+            [
+                    'scanInterface'            :     'com.yuan.root.IApplication'
+                    ,'scanSuperClasses'        :     ['com.yuan.root.BaseApplication']
+                    ,'codeInsertToClassName'   :     'com.yuan.root.AppInitManager'
+                    ,'registerMethodName'  :     'registerApp'
+                    , 'exclude'                 : [
+                    'com.yuan.root.BaseApplication'.replaceAll('\\.', '/')
+                    ,'com/yuan/next/App'.replaceAll('\\.', '/')
+                ]
+            ]
+    ]
+    cacheEnabled = false
+}
+

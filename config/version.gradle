@@ -1,0 +1,93 @@
+
+def build_versions = [:]
+build_versions.min_sdk = 21
+build_versions.target_sdk = 28
+build_versions.build_tools = "28.0.3"
+ext.build_versions = build_versions
+
+ext.deps = [:]
+
+def versions = [:]
+versions.android_gradle_plugin = "3.4.0"
+versions.kotlin = "1.3.21"
+
+versions.support = "1.0.2"
+
+versions.glide = "4.8.0"
+
+
+def gradle =[:]
+gradle.tool = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+
+deps.gradle = gradle
+
+
+def kotlin = [:]
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
+kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+kotlin.allopen = "org.jetbrains.kotlin:kotlin-allopen:$versions.kotlin"
+deps.kotlin = kotlin
+
+def support =[:]
+support.app_compat ="androidx.appcompat:appcompat:$versions.support"
+support.core_ktx ="androidx.core:core-ktx:$versions.support"
+
+deps.support = support
+
+
+deps.autoRegister = "com.billy.android:autoregister:1.4.1"
+
+def ARouter = [:]
+ARouter.arouter_api = "com.alibaba:arouter-api:1.5.0"
+ARouter.arouter_compiler = "com.alibaba:arouter-compiler:1.2.2"
+ARouter.arouter_register = "com.alibaba:arouter-register:1.0.2"
+deps.ARouter = ARouter
+
+def glide = [:]
+glide.runtime = "com.github.bumptech.glide:glide:$versions.glide"
+glide.compiler = "com.github.bumptech.glide:compiler:$versions.glide"
+deps.glide = glide
+
+def material = [:]
+material.material = "com.google.android.material:material:1.0.0"
+deps.material = material
+
+def ui = [:]
+ui.constraintlayout = "androidx.constraintlayout:constraintlayout:1.1.3"
+deps.ui = ui
+
+def test = [:]
+test.junit = "junit:junit:4.12"
+test.runner = "androidx.test:runner:1.1.1"
+test.espresso = "androidx.test.espresso:espresso-core:3.1.1"
+deps.test = test
+
+def addRepos(RepositoryHandler handler){
+    handler.google()
+    handler.jcenter()
+    handler.mavenCentral()
+}
+
+ext.addRepos = this.&addRepos
+
+
+def addBaseLib(DependencyHandler handler){
+
+    handler.implementation fileTree(dir: 'libs', include: ['*.jar'])
+    handler.implementation deps.kotlin.stdlib
+    handler.implementation deps.support.app_compat
+    handler.implementation deps.support.core_ktx
+
+    handler.implementation deps.ui.constraintlayout
+    handler.testImplementation deps.test.junit
+    handler.testImplementation deps.test.runner
+    handler.testImplementation deps.test.espresso
+    handler.implementation deps.glide.runtime
+    handler.implementation deps.ARouter.arouter_api
+    handler.kapt deps.ARouter.arouter_compiler
+    handler.implementation project(':base:root')
+
+}
+
+ext.addBaseLib = this.&addBaseLib
