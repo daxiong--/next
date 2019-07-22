@@ -23,6 +23,8 @@ def addModularization(DependencyHandler handler){
 ext.addModularization = this.&addModularization
 
 
+//todo 生成新module
+
 
 def includeWithApi(String moduleName) {
     //先正常加载这个模块
@@ -42,7 +44,7 @@ def includeWithApi(String moduleName) {
         include(sdkName)
         return
     }
-    //todo 替换成自己的公共模块，或者预先放api.gradle的模块
+    // 替换成自己的公共模块，或者预先放api.gradle的模块
     //这个是公共模块的位置，我预先放了一个 新建的api.gradle 文件进去
     String apiGradle = project(":base:root").projectDir
 
@@ -79,12 +81,12 @@ def includeWithApi(String moduleName) {
     deleteEmptyDir(new File(targetDir))
 
 
-    //todo 替换成自己的包名，这里是 com/yuan/
+    // 替换成自己的包名，这里是 com/yuan/
     //为AndroidManifest新建路径，路径就是在原来的包下面新建一个api包，作为AndroidManifest里面的包名
     String packagePath = "${targetDir}/src/main/java/com/yuan/${originName}/api";
 
 
-    //todo 替换成自己的包名，这里是root模块拷贝的AndroidManifest，替换里面的包名
+    // 替换成自己的包名，这里是root模块拷贝的AndroidManifest，替换里面的包名
     //修改AndroidManifest文件包路径
     fileReader("${targetDir}/src/main/AndroidManifest.xml", "root","${originName}.api");
 
