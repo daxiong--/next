@@ -24,6 +24,9 @@ ext.addModularization = this.&addModularization
 
 
 //todo 生成新module
+//task createNewModule(){
+//
+//}
 
 
 def includeWithApi(String moduleName) {
